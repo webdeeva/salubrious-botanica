@@ -37,3 +37,5 @@
 @media(max-width:700px){.inner-intro>h1,.astrology-intro>h1,.inner-intro>p,.astrology-intro>p,.inner-intro>p:not(.eyebrow),.astrology-intro>p:not(.eyebrow){max-width:100%}.header-decoration{position:relative;width:250px;height:185px;right:auto;top:auto;bottom:auto;margin:-5px -6% -35px auto}.astrology-intro .header-decoration{height:200px;margin-bottom:-50px}.header-decoration:before{width:63%;top:10%;left:15%}.deco-halo{width:74%;left:7%}.deco-sprig{right:-6%;width:70%}.decoration-contact .deco-object{top:-8%;height:76%}.about-art>img:first-child{height:350px}.about-art-ring{right:-5%;top:-10%;height:80%}.product-heading-accent{width:95px;height:120px;top:-10px;right:0}.zodiac-icon-grid{grid-template-columns:repeat(6,24px);gap:13px}.zodiac-icon-grid svg{width:24px;height:24px}}
 @media(max-width:380px){.zodiac-icon-grid{grid-template-columns:repeat(6,22px);gap:9px}.zodiac-icon-grid svg{width:22px;height:22px}}
 @media print{.header-decoration,.product-heading-accent{display:none}.placement-icon{width:25px;height:25px}}
+.about-layout h2{font-size:clamp(36px,4vw,58px);line-height:1.08;margin-bottom:24px}
+.about-layout p+p{margin-top:16px}
