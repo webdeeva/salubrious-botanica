@@ -60,3 +60,19 @@
 .newsletter-form .form-status{flex-basis:100%;color:#fff}
 .newsletter-form .form-status.error{color:#ffd6d1}
 @media(max-width:800px){.inquiry,.form-row{grid-template-columns:1fr}}
+
+.offers{background:var(--cream)}.offers>h2{margin-bottom:50px}
+.offer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.offer{display:flex;flex-direction:column;background:#fbf8ef;border:1px solid #e3dcc6;border-radius:22px;padding:32px 28px}
+.offer h3{font-size:28px;margin:6px 0 14px;line-height:1.1}.offer>p:not([class]){margin:0 0 22px;flex:1}
+.offer-kicker{font-size:11px;letter-spacing:3px;color:#68785c;margin:0}
+.offer-price{font-family:"GFS Didot",serif;font-size:30px;margin:0;color:var(--forest)}
+.offer-note{font-size:13px;color:#6b6a5c;margin:4px 0 22px}.offer .button{align-self:flex-start}
+.offer-price.soon{font-size:22px}
+@media(max-width:1050px){.offer-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:640px){.offer-grid{grid-template-columns:1fr}}
+.offer.featured{background:var(--plum);border-color:var(--plum);color:#fff}
+.offer.featured .offer-kicker,.offer.featured .offer-note{color:#d9c99a}.offer.featured .offer-price{color:#fff}
+.offer.featured .button{background:var(--gold)}.offer.featured .button:hover{background:#fff;color:var(--plum)}
+.manuals{margin-top:22px;display:flex;justify-content:space-between;align-items:center;gap:40px;background:var(--sage);border-radius:22px;padding:34px 36px}
+.manuals h3{font-size:30px;margin:6px 0 10px}.manuals p:not([class]){margin:0;max-width:560px}.manuals-buy{flex-shrink:0}
+@media(max-width:700px){.offers>h2{margin-bottom:32px}.offer{padding:26px 22px}.manuals{display:block;padding:28px 22px}.manuals-buy{margin-top:22px}}
