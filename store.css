@@ -76,3 +76,20 @@
 .manuals{margin-top:22px;display:flex;justify-content:space-between;align-items:center;gap:40px;background:var(--sage);border-radius:22px;padding:34px 36px}
 .manuals h3{font-size:30px;margin:6px 0 10px}.manuals p:not([class]){margin:0;max-width:560px}.manuals-buy{flex-shrink:0}
 @media(max-width:700px){.offers>h2{margin-bottom:32px}.offer{padding:26px 22px}.manuals{display:block;padding:28px 22px}.manuals-buy{margin-top:22px}}
+.booking{background:var(--cream)}.booking-app{max-width:860px;margin:0 auto}
+.booking-step{font-size:30px;margin:44px 0 16px}.booking-app>.booking-step:first-of-type{margin-top:0}
+.booking-muted{color:#5f6457;font-size:14px;margin:6px 0 0}.booking-notice{background:var(--sage);padding:14px 18px;border-radius:14px;margin:0 0 24px}
+.booking-types{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.booking-type{text-align:left;cursor:pointer;background:#fbf8ef;border:1px solid #e3dcc6;border-radius:18px;padding:22px 24px;font:inherit;color:inherit;display:flex;flex-direction:column;gap:6px;transition:border-color .2s}
+.booking-type:hover{border-color:var(--forest)}.booking-type strong{font-family:"GFS Didot",serif;font-size:22px;font-weight:400}.booking-type span{font-size:13px;color:#68785c}.booking-type em{font-style:normal;font-size:15px;line-height:1.5}
+.booking-type.on{background:var(--forest);border-color:var(--forest);color:#fff}.booking-type.on span{color:#d9c99a}
+.booking-days{display:flex;gap:8px;overflow-x:auto;padding:16px 0 8px}
+.booking-days button,.booking-times button{cursor:pointer;font:inherit;font-size:14px;border:1px solid #d9d2bb;background:#fbf8ef;color:var(--ink);border-radius:99px;padding:9px 16px;white-space:nowrap;transition:border-color .2s}
+.booking-times{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}.booking-times button{border-radius:12px;padding:12px 8px}
+.booking-days button:hover,.booking-times button:hover{border-color:var(--forest)}
+.booking-days button.on,.booking-times button.on{background:var(--forest);border-color:var(--forest);color:#fff}
+.booking-form{margin-top:10px}.booking-form .button{margin-top:10px;flex:none}
+.booking-done{text-align:center;background:var(--sage);border-radius:22px;padding:48px 28px}.booking-done h2{font-size:clamp(32px,4vw,46px);margin:0 0 14px}.booking-done .button{margin:22px 0 8px}
+.booking-foot{max-width:860px;margin:40px auto 0;font-size:13px;color:#5f6457}.booking-foot a{text-decoration:underline}
+@media(max-width:700px){.booking-times{grid-template-columns:repeat(3,1fr)}.booking-step{font-size:26px}}
+.booking-type em{color:inherit}.booking-type.on em{color:#f1ece0}
