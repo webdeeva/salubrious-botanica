@@ -94,3 +94,36 @@
 @media(max-width:700px){.booking-times{grid-template-columns:repeat(3,1fr)}.booking-step{font-size:26px}}
 .booking-type em{color:inherit}.booking-type.on em{color:#f1ece0}
 .booking-card{background:#fbf8f0;border:1px solid #cad1c2;border-radius:18px;padding:22px;margin:18px 0}.booking-pay-actions{display:flex;flex-wrap:wrap;align-items:center;gap:18px}.booking-pay-actions .button{margin-top:0}.booking-back{background:none;border:0;padding:0;color:#465642;text-decoration:underline;text-underline-offset:4px;cursor:pointer;font-size:15px}.booking-back:hover{color:var(--plum)}.booking-back:disabled,.booking-pay .button:disabled{opacity:.6;cursor:default}.booking-small{font-size:13px;margin-top:16px}
+
+/* Booking menu: plum "start here" card for free calls, price-first cards for paid sessions. */
+.booking-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px}.booking-head .booking-step{margin-bottom:16px}
+.booking-change{background:none;border:0;padding:0;color:#5f6457;text-decoration:underline;text-underline-offset:4px;cursor:pointer;font-size:14px}.booking-change:hover{color:var(--plum)}
+.booking-feature{position:relative;overflow:hidden;isolation:isolate;width:100%;display:flex;align-items:center;justify-content:space-between;gap:28px;text-align:left;cursor:pointer;border:0;border-radius:26px;padding:34px 38px;background:var(--plum);color:#f6efe2;font:inherit;transition:transform .25s,box-shadow .25s}
+.booking-feature::before{content:"";position:absolute;z-index:-1;width:280px;height:280px;right:-70px;top:-110px;border-radius:50%;background:#ffffff0d}
+.booking-feature::after{content:"";position:absolute;z-index:-1;width:220px;height:220px;right:150px;bottom:-150px;border-radius:50%;background:#a9925826}
+.booking-feature:hover{transform:translateY(-2px);box-shadow:0 22px 40px -26px #422044}
+.booking-feature-copy{display:flex;flex-direction:column;max-width:560px}
+.booking-kicker{font-size:11px;letter-spacing:3.5px;color:#d9c99a}
+.booking-feature strong{font:400 clamp(30px,3.4vw,42px)/1.08 "GFS Didot",Georgia,serif;letter-spacing:-.04em;margin-top:12px}
+.booking-feature .booking-desc{color:#efe6f0;margin-top:14px}
+.booking-feature-side{display:flex;flex-direction:column;align-items:flex-end;gap:16px;flex:none}
+.booking-feature .booking-price{font-size:44px;color:#fff}
+.booking-cta{background:var(--cream);color:var(--plum);border-radius:99px;padding:13px 26px;font-size:14px;transition:background .2s}.booking-feature:hover .booking-cta{background:#fff}
+.booking-facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.booking-facts>span{display:inline-flex;align-items:center;gap:6px;font-size:13px;line-height:1;padding:7px 12px;border-radius:99px;background:#e8e6d4;color:#4c5a45}
+.booking-feature .booking-facts>span{background:#ffffff1f;color:#f6efe2}
+.booking-facts svg,.booking-chosen svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.booking-group{display:flex;flex-direction:column;border-bottom:1px solid #d8d2bd;padding-bottom:14px;margin:40px 0 18px}.booking-group .eyebrow{margin:0;font-size:11px;letter-spacing:3.5px}.booking-group-title{font:400 24px/1.2 "GFS Didot",Georgia,serif;margin:8px 0 0}
+.booking-type{gap:0;padding:24px;transition:border-color .2s,transform .2s,box-shadow .2s}.booking-type:hover{transform:translateY(-2px);border-color:#422044aa;box-shadow:0 16px 30px -24px #10271b}
+.booking-type-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}.booking-type .booking-type-top{font-size:inherit;color:inherit}
+.booking-type .booking-price{font:400 26px/1 "GFS Didot",Georgia,serif;color:var(--plum)}
+.booking-type .booking-facts>span{color:#4c5a45}
+.booking-type .booking-desc{display:block;font-size:15px;line-height:1.5;color:#4b5244;margin-top:14px}
+.booking-select{margin-top:auto;padding-top:18px;font-size:13px!important;color:var(--plum)!important}.booking-select i{font-style:normal;display:inline-block;transition:transform .2s}.booking-type:hover .booking-select i{transform:translateX(4px)}
+.booking-type.on{background:#fbf8ef;color:inherit;border-color:var(--plum);box-shadow:0 0 0 4px #42204418}.booking-type.on .booking-price{color:var(--plum)}.booking-type.on .booking-facts>span{color:#4c5a45}
+.booking-chosen{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--plum)}.booking-chosen svg{width:20px;height:20px;padding:3px;border-radius:50%;background:var(--plum);color:#fff;stroke-width:2.6}
+.booking-type .booking-chosen{margin-top:18px}
+.booking-feature.on .booking-chosen{color:#fff;font-size:14px}.booking-feature.on .booking-chosen svg{background:#fff;color:var(--plum)}.booking-feature.on{cursor:default}.booking-feature.on:hover{transform:none;box-shadow:none}
+@media(max-width:700px){.booking-feature{flex-direction:column;align-items:flex-start;padding:28px 24px}.booking-feature-side{flex-direction:row;align-items:center;width:100%;justify-content:space-between}.booking-feature .booking-price{font-size:36px}}
+.booking-type .booking-chosen{color:var(--plum);font-size:13px}
+.booking-feature .booking-price{font-family:"GFS Didot",Georgia,serif;letter-spacing:-.03em;line-height:1}

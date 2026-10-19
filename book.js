@@ -129,6 +129,26 @@
     root.querySelector(".booking-pay-actions").before(p);
   }
 
+  var ICON = {
+    clock: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    video: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg>',
+    phone: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
+    office: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>',
+    check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>'
+  };
+
+  // Free calls get the large plum "start here" card; paid sessions get a smaller card with the price up top.
+  function typeCard(t, on) {
+    var facts = '<span class="booking-facts"><span>' + ICON.clock + t.minutes + " min</span><span>" + ICON[t.where] + WHERE[t.where] + "</span></span>";
+    var desc = t.description ? '<span class="booking-desc">' + esc(t.description) + "</span>" : "";
+    var tag = on ? '<span class="booking-chosen">' + ICON.check + "Selected</span>" : "";
+    if (!t.price)
+      return '<button type="button" class="booking-feature' + (on ? " on" : "") + '" data-type="' + esc(t.id) + '" aria-pressed="' + on + '"><span class="booking-feature-copy"><span class="booking-kicker">START HERE</span><strong>' +
+        esc(t.name) + "</strong>" + facts + desc + '</span><span class="booking-feature-side"><span class="booking-price">Free</span>' + (on ? tag : '<span class="booking-cta">Choose a time</span>') + "</span></button>";
+    return '<button type="button" class="booking-type' + (on ? " on" : "") + '" data-type="' + esc(t.id) + '" aria-pressed="' + on + '"><span class="booking-type-top"><strong>' + esc(t.name) +
+      '</strong><span class="booking-price">' + price(t.price) + "</span></span>" + facts + desc + (on ? tag : '<span class="booking-select">Select <i>→</i></span>') + "</button>";
+  }
+
   function render() {
     if (state.paying && !state.done) return renderPayment();
     if (state.done) {
@@ -146,13 +166,14 @@
     }
     var h = "";
     if (state.notice) h += '<p class="booking-notice">' + esc(state.notice) + "</p>";
-    h += '<h2 class="booking-step">1. Choose a call</h2><div class="booking-types">';
-    state.types.forEach(function (t) {
-      var on = state.type && state.type.id === t.id;
-      h += '<button type="button" class="booking-type' + (on ? " on" : "") + '" data-type="' + esc(t.id) + '" aria-pressed="' + on + '"><strong>' + esc(t.name) + "</strong><span>" +
-        t.minutes + " min · " + WHERE[t.where] + " · " + price(t.price) + "</span>" + (t.description ? "<em>" + esc(t.description) + "</em>" : "") + "</button>";
-    });
-    h += "</div>";
+    var many = state.types.length > 1;
+    h += '<div class="booking-head"><h2 class="booking-step">1. Choose a call</h2>' + (state.type && many ? '<button type="button" class="booking-change">Change</button>' : "") + "</div>";
+    if (state.type) h += typeCard(state.type, true);
+    else {
+      var free = state.types.filter(function (t) { return !t.price; }), paid = state.types.filter(function (t) { return t.price; });
+      h += free.map(function (t) { return typeCard(t, false); }).join("");
+      if (paid.length) h += '<div class="booking-group"><p class="eyebrow">SESSIONS</p><p class="booking-group-title">Book and pay online</p></div><div class="booking-types">' + paid.map(function (t) { return typeCard(t, false); }).join("") + "</div>";
+    }
     if (state.type) {
       h += '<h2 class="booking-step">2. Pick a time</h2><p class="booking-muted">Times are shown in your time zone (' + esc(tz.replace(/_/g, " ")) + ").</p>";
       if (!state.slots) h += '<p class="booking-muted">Finding open times…</p>';
@@ -201,6 +222,15 @@
         });
       return;
     }
+    if (b.classList.contains("booking-change") || (b.dataset.type && state.type && state.type.id === b.dataset.type && state.types.length > 1)) {
+      state.type = null;
+      state.time = "";
+      state.slots = null;
+      state.error = "";
+      render();
+      return;
+    }
+    if (b.dataset.type && state.type && state.type.id === b.dataset.type) return;
     if (b.dataset.type) {
       state.type = state.types.filter(function (t) { return t.id === b.dataset.type; })[0];
       state.time = "";
