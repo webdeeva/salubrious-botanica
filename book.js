@@ -1,5 +1,5 @@
 // Booking on Botanica. Salubrious HQ knows Nicole's hours and Google Calendar,
-// holds paid times during Stripe checkout, and tells the CRM.
+// holds paid times while the visitor pays right here (Stripe Payment Element), and tells the CRM.
 (function () {
   var HQ = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? "http://localhost:3300" : "https://salubrious-admin.netlify.app";
   var root = document.getElementById("booking");
@@ -7,7 +7,26 @@
 
   var WHERE = { video: "Video call", phone: "Phone call", office: "In person" };
   var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  var state = { types: [], type: null, slots: null, day: "", time: "", busy: false, error: "", notice: "", done: null };
+  var state = { types: [], type: null, slots: null, day: "", time: "", busy: false, error: "", notice: "", done: null, paying: null };
+  var testing = new URLSearchParams(location.search).get("test") === "1";
+  var stripeJs = null, pay = { stripe: null, elements: null, element: null, ready: false };
+
+  function loadStripe(key) {
+    stripeJs = stripeJs || new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = "https://js.stripe.com/v3/";
+      s.onload = function () { resolve(window.Stripe); };
+      s.onerror = function () { stripeJs = null; reject(new Error("The payment form couldn't load. Please check your connection and try again.")); };
+      document.head.appendChild(s);
+    });
+    return stripeJs.then(function (Stripe) { return Stripe(key); });
+  }
+
+  var appearance = {
+    theme: "stripe",
+    variables: { colorPrimary: "#422044", colorBackground: "#fbf8f0", colorText: "#10271b", colorDanger: "#a3271f", fontFamily: "'DM Sans', sans-serif", fontSizeBase: "16px", borderRadius: "10px" },
+    rules: { ".Input": { border: "1px solid #cad1c2", boxShadow: "none" }, ".Input:focus": { borderColor: "#422044", boxShadow: "0 0 0 3px #42204422" } }
+  };
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -52,7 +71,66 @@
       .catch(function (e) { state.error = e.message; render(); });
   }
 
+  function renderPayment() {
+    var p = state.paying;
+    root.innerHTML =
+      '<form class="booking-form booking-pay"><h2 class="booking-step">4. Payment</h2><p class="booking-muted">' + esc(p.booking.typeName) + " · " + esc(fmtFull(p.booking.start)) +
+      '</p><p class="booking-muted">We are holding this time for you for 30 minutes.</p><div class="booking-card">' + (pay.ready ? "" : '<p class="booking-muted booking-loading">Loading secure payment form…</p>') +
+      '<div id="payment-element"></div></div>' + (state.error ? '<p class="form-status error" role="alert">' + esc(state.error) + "</p>" : "") +
+      '<div class="booking-pay-actions"><button class="button" type="submit"' + (state.busy || !pay.ready ? " disabled" : "") + ">" + (state.busy ? "One moment…" : "Pay " + price(p.payment.amount) + " and book") +
+      '</button><button type="button" class="booking-back"' + (state.busy ? " disabled" : "") + '>Choose a different time</button></div><p class="booking-muted booking-small">Payments are processed securely by Stripe. Your card details never touch our servers.</p></form>';
+    if (pay.element) { pay.element.unmount(); pay.element.mount("#payment-element"); }
+  }
+
+  function startPayment(booking, payment) {
+    state.paying = { booking: booking, payment: payment };
+    state.error = "";
+    pay.ready = false;
+    renderPayment();
+    root.scrollIntoView({ behavior: "smooth", block: "start" });
+    loadStripe(payment.publishableKey)
+      .then(function (stripe) {
+        pay.stripe = stripe;
+        pay.elements = stripe.elements({ clientSecret: payment.clientSecret, appearance: appearance, fonts: [{ cssSrc: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&display=swap" }] });
+        pay.element = pay.elements.create("payment", { layout: "tabs" });
+        pay.element.on("ready", function () {
+          pay.ready = true;
+          var l = root.querySelector(".booking-loading");
+          if (l) l.remove();
+          var b = root.querySelector(".booking-pay button[type=submit]");
+          if (b && !state.busy) b.disabled = false;
+        });
+        pay.element.mount("#payment-element");
+      })
+      .catch(function (e) { state.error = e.message; renderPayment(); });
+  }
+
+  function endPayment() {
+    if (pay.element) pay.element.destroy();
+    pay = { stripe: null, elements: null, element: null, ready: false };
+    state.paying = null;
+  }
+
+  function setPayBusy(busy) {
+    state.busy = busy;
+    root.querySelectorAll(".booking-pay button").forEach(function (b) { b.disabled = busy || (b.type === "submit" && !pay.ready); });
+    var sub = root.querySelector(".booking-pay button[type=submit]");
+    if (sub) sub.textContent = busy ? "One moment…" : "Pay " + price(state.paying.payment.amount) + " and book";
+  }
+
+  function showPayError(msg) {
+    var old = root.querySelector(".booking-pay .form-status");
+    if (old) old.remove();
+    if (!msg) return;
+    var p = document.createElement("p");
+    p.className = "form-status error";
+    p.setAttribute("role", "alert");
+    p.textContent = msg;
+    root.querySelector(".booking-pay-actions").before(p);
+  }
+
   function render() {
+    if (state.paying && !state.done) return renderPayment();
     if (state.done) {
       var b = state.done;
       root.innerHTML =
@@ -109,6 +187,20 @@
   root.addEventListener("click", function (e) {
     var b = e.target.closest("button");
     if (!b || b.type === "submit") return;
+    if (b.classList.contains("booking-back")) {
+      var p = state.paying;
+      setPayBusy(true);
+      call("/api/public/booking/return", { booking: p.booking.id, paymentIntent: p.payment.clientSecret.split("_secret_")[0], cancelled: true })
+        .catch(function () {})
+        .then(function () {
+          endPayment();
+          state.busy = false;
+          state.time = "";
+          state.notice = "That time has been released. Choose another below.";
+          loadSlots();
+        });
+      return;
+    }
     if (b.dataset.type) {
       state.type = state.types.filter(function (t) { return t.id === b.dataset.type; })[0];
       state.time = "";
@@ -129,6 +221,7 @@
 
   root.addEventListener("submit", function (e) {
     e.preventDefault();
+    if (state.paying) return submitPayment();
     var f = e.target, v = function (n) { return f.elements[n] ? f.elements[n].value : ""; };
     var draft = { name: v("name"), email: v("email"), phone: v("phone"), note: v("note") };
     state.busy = true;
@@ -136,8 +229,8 @@
     render();
     call("/api/public/booking", { typeId: state.type.id, start: state.time, name: draft.name, email: draft.email, phone: draft.phone, note: draft.note, company: v("company") })
       .then(function (d) {
-        if (d.checkoutUrl) { location.href = d.checkoutUrl; return; }
         state.busy = false;
+        if (d.payment) return startPayment(d.booking, d.payment);
         state.done = d.booking;
         render();
       })
@@ -149,27 +242,36 @@
       });
   });
 
-  // Back from Stripe checkout?
-  var q = new URLSearchParams(location.search);
-  var back = q.get("booking")
-    ? call("/api/public/booking/return", { booking: q.get("booking"), sessionId: q.get("session_id") || "", cancelled: q.get("cancelled") === "1" })
-        .then(function (d) {
-          if (d.booking.status === "confirmed") state.done = d.booking;
-          else state.notice = q.get("cancelled") === "1" ? "Payment was cancelled, so that time was not booked. You can choose again below." : "We are still waiting on your payment. If you completed it, you will get an email shortly.";
-        })
-        .catch(function (e) { state.notice = e.message; })
-        .then(function () { history.replaceState(null, "", location.pathname); })
-    : Promise.resolve();
-
-  back.then(function () {
-    if (state.done) return render();
-    call("/api/public/booking/types?site=botanica")
-      .then(function (d) {
-        state.types = d.types;
-        state.loaded = true;
-        if (d.types.length === 1) { state.type = d.types[0]; loadSlots(); }
-        else render();
+  function submitPayment() {
+    var p = state.paying;
+    if (!pay.stripe || !pay.ready || state.busy) return;
+    setPayBusy(true);
+    showPayError("");
+    pay.stripe
+      .confirmPayment({ elements: pay.elements, redirect: "if_required", confirmParams: { return_url: location.origin + "/book/" } })
+      .then(function (r) {
+        if (r.error) throw new Error(r.error.message || "Your payment didn't go through. Please try again.");
+        return call("/api/public/booking/return", { booking: p.booking.id, paymentIntent: p.payment.clientSecret.split("_secret_")[0] });
       })
-      .catch(function (e) { state.error = e.message; state.loaded = true; render(); });
-  });
+      .then(function (d) {
+        if (d.booking.status !== "confirmed") throw new Error("Your payment went through and we're confirming it now. You'll get an email shortly.");
+        endPayment();
+        state.busy = false;
+        state.done = d.booking;
+        render();
+      })
+      .catch(function (err) {
+        setPayBusy(false);
+        showPayError(err.message);
+      });
+  }
+
+  call("/api/public/booking/types?site=botanica" + (testing ? "&test=1" : ""))
+    .then(function (d) {
+      state.types = d.types;
+      state.loaded = true;
+      if (d.types.length === 1) { state.type = d.types[0]; loadSlots(); }
+      else render();
+    })
+    .catch(function (e) { state.error = e.message; state.loaded = true; render(); });
 })();

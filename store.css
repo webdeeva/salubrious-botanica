@@ -93,3 +93,4 @@
 .booking-foot{max-width:860px;margin:40px auto 0;font-size:13px;color:#5f6457}.booking-foot a{text-decoration:underline}
 @media(max-width:700px){.booking-times{grid-template-columns:repeat(3,1fr)}.booking-step{font-size:26px}}
 .booking-type em{color:inherit}.booking-type.on em{color:#f1ece0}
+.booking-card{background:#fbf8f0;border:1px solid #cad1c2;border-radius:18px;padding:22px;margin:18px 0}.booking-pay-actions{display:flex;flex-wrap:wrap;align-items:center;gap:18px}.booking-pay-actions .button{margin-top:0}.booking-back{background:none;border:0;padding:0;color:#465642;text-decoration:underline;text-underline-offset:4px;cursor:pointer;font-size:15px}.booking-back:hover{color:var(--plum)}.booking-back:disabled,.booking-pay .button:disabled{opacity:.6;cursor:default}.booking-small{font-size:13px;margin-top:16px}
