@@ -23,6 +23,14 @@
       data.site = "botanica";
       data.type = data.type || form.getAttribute("data-hq-form");
       data.page = location.pathname;
+      // Extra questions (fields with data-label) are folded into the message HQ stores.
+      var answers = [];
+      form.querySelectorAll("[data-label]").forEach(function (field) {
+        var value = (data[field.name] || "").trim();
+        delete data[field.name];
+        if (value) answers.push(field.getAttribute("data-label") + ":\n" + value);
+      });
+      if (answers.length) data.message = answers.concat(data.message ? [data.message] : []).join("\n\n");
       button.disabled = true;
       status.textContent = "Sending…";
       status.className = "form-status";
@@ -39,7 +47,7 @@
         })
         .then(function (body) {
           form.reset();
-          status.textContent = body.message || "Thank you.";
+          status.textContent = form.getAttribute("data-success") || body.message || "Thank you.";
           status.className = "form-status ok";
         })
         .catch(function (err) {
